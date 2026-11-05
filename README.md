@@ -1,4 +1,4 @@
-<img width="2172" height="724" alt="Image" src="https://github.com/user-attachments/assets/e6c20a12-aca2-4828-bcb5-f0fc44d31cd4" />
+<img width="2172" height="724" alt="Image" src="https://github.com/user-attachments/assets/2df8698b-26e5-42df-9778-fda65ab99337" />
 
 ## Overview
 
@@ -26,7 +26,8 @@ It allows you to convert UserForms created in Microsoft Excel VBA into GUI code 
 - **Image Handling** — Configure how images embedded in UserForms are exported or referenced.
 
 
-## User Interface
+## Usage
+<img width="423" height="499" alt="Image" src="https://github.com/user-attachments/assets/22eee50d-b973-45b7-a921-efc6fdee03f1" />
 
 The application provides a simple workflow for converting UserForms.
 
@@ -110,7 +111,7 @@ Available options depend on the selected output target.
 
 ## How It Works
 
-VBA UserForm Transpiler combines three existing conversion engines:
+VBA UserForm Transpiler integrates multiple conversion engines to support different target platforms and programming languages:
 
 ```text
                   VBA UserForm Transpiler

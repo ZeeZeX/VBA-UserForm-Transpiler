@@ -15,7 +15,6 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
-
 ' VBA-UserForm-Transpiler
 ' https://github.com/ZeeZeX/VBA-UserForm-Transpiler
 ' Copyright (c) 2026 ZeeZeX
@@ -40,11 +39,21 @@ Private Sub btnConvert_Click()
         Exit Sub
     End If
     
+    If Not Contains(GetWorkbookNames(), cbWorkbooks.value) Then
+        MsgBox "The selected workbook was not found."
+        Exit Sub
+    End If
+    
     Set wb = Workbooks(cbWorkbooks.value)
+    
+    If Not Contains(GetUserFormNames(wb), cbUserForms.value) Then
+        MsgBox "The selected UserForm was not found."
+        Exit Sub
+    End If
     
     Set uf = GetUserFormFromWorkbook(wb, cbUserForms.value)
     uf.Hide
-    Select Case cbConvertTo.value
+    Select Case cbTarget.value
         Case OPTION_NAME_TKINTER
             Call ConvertForm2Tkinter(uf, _
                 useCls:=chkUseClass.value, _
@@ -64,20 +73,20 @@ Private Sub btnConvert_Click()
                 imageMode:=cbImageMode.value, _
                 langAttribute:=cbLangAttribute)
         Case Else
-            MsgBox "Failed"
+            MsgBox "Failed: Invalid Target"
     End Select
 End Sub
 
-Private Sub cbConvertTo_Change()
+Private Sub cbTarget_Change()
     Call SetOptionControlsPosition
     Call ListImageMode
 End Sub
 
 
 Private Sub UserForm_Initialize()
-    cbConvertTo.Clear
-    cbConvertTo.List = Array(OPTION_NAME_TKINTER, OPTION_NAME_PS_WINFORMS, OPTION_NAME_HTML)
-    cbConvertTo.value = cbConvertTo.List(0)
+    cbTarget.Clear
+    cbTarget.List = Array(OPTION_NAME_TKINTER, OPTION_NAME_PS_WINFORMS, OPTION_NAME_HTML)
+    cbTarget.value = cbTarget.List(0)
     Call ResetComboBox
     
     With cbLangAttribute
@@ -96,7 +105,7 @@ Private Sub SetOptionControlsPosition()
     baseLeft = labelOptions.Left
     
     
-    Select Case cbConvertTo.value
+    Select Case cbTarget.value
         Case OPTION_NAME_TKINTER
             availableCtrls = Array(chkUseClass, chkNoMainLoop, chkUniqueStyleName, frameImageMode)
         Case OPTION_NAME_PS_WINFORMS
@@ -123,55 +132,42 @@ Private Sub SetOptionControlsPosition()
 End Sub
 
 Private Sub ListUserForms(ByVal wb As Workbook)
-
-    Dim vbComp As Object
-    Dim isValueSet As Boolean
-    Dim collUserForms As Collection
     Dim arrUserForms() As Variant
-    Set collUserForms = New Collection
     cbUserForms.Clear
-    For Each vbComp In wb.VBProject.VBComponents
-        If vbComp.Type = 3 Then  ' vbext_ct_MSForm
-            collUserForms.Add vbComp.Name
-        End If
-    Next vbComp
-    
-    If collUserForms.count = 0 Then
+    arrUserForms = GetUserFormNames(wb)
+    If ArrayCount(arrUserForms) = 0 Then
         cbUserForms.value = ""
     Else
-        arrUserForms = CollectionToArray(collUserForms)
-        Call QuickSortArray(arrUserForms)
         cbUserForms.List = arrUserForms
         cbUserForms.value = arrUserForms(0)
     End If
     
-    
 End Sub
 
 Private Sub ListWorkbooks()
-    Dim wb As Workbook
-    Dim isValueSet As Boolean
+    Dim arrWorkbookNames() As Variant
     cbWorkbooks.Clear
-    isValueSet = False
-    For Each wb In Workbooks
-        cbWorkbooks.AddItem wb.Name
-        If Not isValueSet Then
-            If wb.Name <> ThisWorkbook.Name Then
-                cbWorkbooks.value = wb.Name
-                isValueSet = True
-            End If
-        End If
-    Next
     
-    If Not isValueSet Then
-        cbWorkbooks.value = ThisWorkbook.Name
+    arrWorkbookNames = GetWorkbookNames()
+    cbWorkbooks.List = arrWorkbookNames
+    If ArrayCount(arrWorkbookNames) >= 2 Then
+        If arrWorkbookNames(0) = ThisWorkbook.Name Then
+            cbWorkbooks.value = arrWorkbookNames(1)
+        Else
+            cbWorkbooks.value = arrWorkbookNames(0)
+        End If
+    ElseIf ArrayCount(arrWorkbookNames) >= 1 Then
+        cbWorkbooks.value = arrWorkbookNames(0)
+    Else
+        cbWorkbooks.value = ""
     End If
+    
 End Sub
 
 Private Sub ListImageMode()
     Dim selectableOptions() As Variant
     Dim previousValue As String
-    Select Case cbConvertTo.value
+    Select Case cbTarget.value
         Case OPTION_NAME_TKINTER
             selectableOptions = Array("file", "disabled", "reference-only", "base64", "base64-dict", "base64-json", "base64-json-reference")
         Case OPTION_NAME_PS_WINFORMS
@@ -194,6 +190,36 @@ Private Sub ListImageMode()
     End With
 End Sub
 
+Private Function GetUserFormNames(ByVal wb As Workbook) As Variant()
+    Dim vbComp As Object
+    Dim collUserForms As Collection
+    Dim arrUserForms() As Variant
+    Set collUserForms = New Collection
+    For Each vbComp In wb.VBProject.VBComponents
+        If vbComp.Type = 3 Then  ' vbext_ct_MSForm
+            collUserForms.Add vbComp.Name
+        End If
+    Next vbComp
+    arrUserForms = CollectionToArray(collUserForms)
+    If collUserForms.count > 0 Then
+        Call QuickSortArray(arrUserForms)
+    End If
+    GetUserFormNames = arrUserForms
+End Function
+
+Private Function GetWorkbookNames() As Variant()
+    Dim wb As Workbook
+    Dim arrWorkbookNames() As Variant
+    Dim collWorkbookNames As Collection
+    Set collWorkbookNames = New Collection
+    For Each wb In Workbooks
+        collWorkbookNames.Add wb.Name
+    Next
+    arrWorkbookNames = CollectionToArray(collWorkbookNames)
+    GetWorkbookNames = arrWorkbookNames
+End Function
+
+
 Private Function Contains(ByRef arr As Variant, ByVal targetValue As Variant) As Boolean
     Dim item As Variant
     For Each item In arr
@@ -203,6 +229,10 @@ Private Function Contains(ByRef arr As Variant, ByVal targetValue As Variant) As
         End If
     Next
     Contains = False
+End Function
+
+Private Function ArrayCount(ByRef arr As Variant) As Long
+    ArrayCount = UBound(arr) - LBound(arr) + 1
 End Function
 
 Private Sub ResetComboBox()
@@ -374,3 +404,5 @@ Private Function CollectionToArray(ByVal coll As Collection, Optional ByVal isSt
     End If
     CollectionToArray = arr
 End Function
+
+
