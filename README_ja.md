@@ -1,5 +1,7 @@
 <img width="2172" height="724" alt="Image" src="https://github.com/user-attachments/assets/2df8698b-26e5-42df-9778-fda65ab99337" />
 
+🌎[English](https://github.com/ZeeZeX/VBA-UserForm-Transpiler/blob/main/README.md)<br><br>
+
 ## 概要
 
 **VBA UserForm Transpiler** は、Excel VBA のユーザーフォームを、さまざまなターゲットプラットフォームおよびプログラミング言語向けの GUI コードに変換するための、GUI ベースのツールです。
