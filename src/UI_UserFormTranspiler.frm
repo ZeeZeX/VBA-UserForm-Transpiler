@@ -254,6 +254,7 @@ Private Function GetUserFormFromWorkbook( _
     ByVal wb As Workbook, _
     ByVal formName As String) As Object
 
+    Dim isSaved As Boolean
     Dim comp As Object
     Dim tmpComp As Object
     Dim frm As Object
@@ -264,6 +265,8 @@ Private Function GetUserFormFromWorkbook( _
 
     Dim errNum As Long
     Dim errDesc As String
+    
+    isSaved = wb.Saved
     
     If wb Is ThisWorkbook Then
         Set GetUserFormFromWorkbook = VBA.UserForms.Add(formName)
@@ -324,6 +327,8 @@ CleanUp:
     End If
     On Error GoTo 0
 
+    wb.Saved = isSaved
+    
     If errNum <> 0 Then
         Err.Raise errNum, , errDesc
     End If
@@ -404,5 +409,7 @@ Private Function CollectionToArray(ByVal coll As Collection, Optional ByVal isSt
     End If
     CollectionToArray = arr
 End Function
+
+
 
 

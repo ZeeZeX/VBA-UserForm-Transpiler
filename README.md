@@ -52,7 +52,7 @@ To use this tool, you must enable the following setting in Excel:
 4.  Check **Trust access to the VBA project object model**.
 5.  Click **OK**.
 
-### Conversion Environment
+### Operating Environments
 
 - Microsoft Windows
 - Microsoft Excel with VBA support
@@ -61,6 +61,23 @@ To use this tool, you must enable the following setting in Excel:
 The original conversion engines have been tested with various Windows and Microsoft Office versions, including Windows 10/11 and both 32-bit and 64-bit Office installations.
 
 Microsoft Excel 2016 or later is recommended.
+
+<details>
+<summary>Running the Application in Older Versions of Microsoft Office</summary>
+
+To use this application with Office 2000, Office XP, or Office 2003, you must install the **Microsoft Office Compatibility Pack** on your PC.
+
+Download the file from [here](http://web.archive.org/web/20120201204132/http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=3), install it, and then restart your PC.
+
+If you want to download the file directly, copy and paste the following URL into your browser's address bar:
+```
+http://web.archive.org/web/20111016032501/http://download.microsoft.com/download/9/2/2/9222d67f-7630-4f49-bd26-476b51517fc1/FileFormatConverters.exe
+```
+After installing the Microsoft Office Compatibility Pack, opening an `.xlsm` file will convert it to `.xls` format. However, the converted `.xls` file will be placed in a temporary folder, which prevents the application from working correctly.
+
+Before using the application, please use **Save As** to save the `.xls` file to a different folder.
+
+</details>
 
 ### Generated Code Runtime Requirements
 
@@ -91,7 +108,7 @@ Available options depend on the selected output target.
 
 - **Use Class/Prefix** — Generate the output using a class-based structure or apply a specified prefix to generated identifiers, depending on the target platform. This helps organize the generated code and avoid naming conflicts.
 
-- **Save As `.bat`** — Generate a `.bat` launcher file alongside the PowerShell script. This allows the generated script to be launched directly by double-clicking the batch file.
+- **Save As `.bat`** — The generated PowerShell script will be saved as a `.bat` file that can be executed by double-clicking.
 
 - **No Mainloop** — Omit the main event loop or display method from the generated code. This is useful when integrating the generated GUI into an existing application or managing the GUI lifecycle externally.
 
@@ -108,6 +125,32 @@ Available options depend on the selected output target.
   - `base64-json` — Store Base64-encoded image data in an external JSON file.
   - `base64-json-reference` — Reference an existing JSON image file without exporting it.
 
+## Output Directory
+
+All generated files are automatically saved in a dedicated output folder created in the same directory as `VBA-UserForm-Transpiler.xlsm`.
+
+The output folder name depends on the selected conversion target:
+
+| Target | Output Folder |
+|---|:---:|
+| Python (Tkinter) | `VBAForm2Tkinter_output` |
+| PowerShell (WinForms) | `VBAForm2PS_output` |
+| HTML/CSS | `VBAForm2HTML_output` |
+
+### Directory Structure
+
+The following example shows the output directory structure for Python (Tkinter):
+
+```
+ApplicationFolder/
+├─ VBA-UserForm-Transpiler.xlsm
+└─ VBAForm2Tkinter_output/
+   ├─ output.py
+   ├─ image_base64.json
+   └─ exported images...
+```
+
+All generated files, including exported images and auxiliary files, are stored in the corresponding output folder.
 
 ## How It Works
 
